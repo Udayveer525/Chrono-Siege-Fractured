@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>NOVA DEFENSE — Sci-Fi Tower Defense</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      height: 100vh;
+      width: 100vw;
+      background: #04040d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #game-wrapper {
+      position: relative;
+      /* Phaser injects its canvas here; FIT mode handles sizing */
+    }
+
+    /* Scanlines overlay on top of the canvas */
+    #game-wrapper::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent, transparent 2px,
+        rgba(0,255,200,0.012) 2px, rgba(0,255,200,0.012) 4px
+      );
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    /* Vignette */
+    #game-wrapper::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.65) 100%);
+      pointer-events: none;
+      z-index: 998;
+    }
+
+    #tooltip {
+      position: fixed;
+      background: rgba(4,4,20,0.97);
+      border: 1px solid #00ffcc;
+      border-radius: 4px;
+      padding: 10px 14px;
+      color: #00ffcc;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px;
+      line-height: 1.8;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.12s;
+      z-index: 10000;
+      white-space: nowrap;
+      box-shadow: 0 0 20px rgba(0,255,200,0.25);
+    }
+    #tooltip.visible { opacity: 1; }
+    #tooltip .tip-name  { font-size: 13px; color: #fff; font-family: 'Orbitron', sans-serif; font-weight: 700; letter-spacing: 1px; margin-bottom: 4px; }
+    #tooltip .tip-cost  { color: #ffd700; }
+    #tooltip .tip-stat  { color: #888; }
+    #tooltip .tip-stat span { color: #00ffcc; }
+  </style>
+</head>
+<body>
+  <div id="game-wrapper"></div>
+  <div id="tooltip"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.js"></script>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

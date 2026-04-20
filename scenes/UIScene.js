@@ -159,8 +159,9 @@ export default class UIScene extends Phaser.Scene {
       }).setOrigin(0.5);
 
       btn.on("pointerdown", () => {
-        this.gameScene.time.timeScale   = s;
-        this.gameScene.tweens.timeScale = s;
+        // game.loop.timeScale scales the entire game clock including delta,
+        // which drives enemy movement, fire timers, tweens — everything.
+        this.game.loop.timeScale = s;
         this._speedBtns.forEach(([b, t, sv]) => {
           b.setFillStyle(sv === s ? 0x002222 : 0x001111);
           t.setColor(sv === s ? "#00ffcc" : "#446666");

@@ -15,7 +15,7 @@ export const ACTS = [
     tagline: "The machine that held time together just broke.",
     color: 0x00ffcc,
     colorHex: "#00ffcc",
-    levelIds: [1, 2, 3],      // which levels belong to this act
+    levelIds: [1, 2, 3, 4, 5], // which levels belong to this act
     unlockRequirement: 0,      // levels completed in previous act needed to unlock
 
     // Full cinematic script — each entry is one "beat" on screen
@@ -48,7 +48,7 @@ export const ACTS = [
     tagline: "They've noticed us. Now they're coming deliberately.",
     color: 0xff6600,
     colorHex: "#ff6600",
-    levelIds: [4, 5, 6],
+    levelIds: [6, 7, 8],
     unlockRequirement: 3,
 
     cinematic: [
@@ -160,74 +160,109 @@ export const ACTS = [
 
 // ─── LEVEL LORE (keyed by level id) ─────────────────────────────────────────
 export const LEVEL_LORE = {
+
+  // ── ACT 1: FIRST FRACTURE ─────────────────────────────────────────────────
+
   1: {
     name: "BREACH POINT ZERO",
-    subtitle: "First contact with the unknown",
-    lore: "The Core just broke.\nThe first distortions are weak — echoes more than entities.\nLearn the defense systems. This is where it starts.",
+    subtitle: "The wound opens",
+    lore: "Seven seconds ago, the Chrono Core went critical.\nThe first breach is small. Disorganised. Almost confused.\nThey don't know where they are yet.\n\nYou do. Keep it that way.",
   },
   2: {
-    name: "THE GAUNTLET",
-    subtitle: "No safe ground",
-    lore: "The fracture is widening.\nThey're pouring through a winding corridor in spacetime.\nEvery turn is contested. No position is safe.",
+    name: "THE WINDING",
+    subtitle: "They are learning the geography",
+    lore: "The distortions are adapting to our space.\nThey're no longer appearing at random — they're finding routes.\nThis corridor twists. Use that against them.\n\nEvery corner you hold is a second you buy.",
   },
   3: {
     name: "SIGNAL LOST",
-    subtitle: "The Core goes silent",
-    lore: "Contact with the Chrono Core has been severed.\nYou're defending blind.\nThe distortions are getting faster. Smarter.",
+    subtitle: "The Core goes dark",
+    lore: "Core telemetry just dropped to zero.\nNo diagnostics. No status. No contact.\nWe are defending something we can no longer see or measure.\n\nThat means we defend it harder.",
   },
   4: {
-    name: "COORDINATED STRIKE",
-    subtitle: "They are no longer accidents",
-    lore: "These aren't random echoes anymore.\nSomething in another timeline is directing them.\nHold the perimeter.",
+    name: "THE CANYON RUN",
+    subtitle: "Nowhere to hide. Nowhere to run.",
+    lore: "The fracture has carved a deep corridor through spacetime.\nThere are no flanks here. No cover.\nEnemies walk the same path twice before reaching the Core.\n\nSo do your bullets. Plan accordingly.",
   },
   5: {
-    name: "PHANTOM GRID",
-    subtitle: "Fast. Invisible. Everywhere.",
-    lore: "A new class of entity has emerged from the bleed.\nPhantoms — temporal ghosts that move faster than your targeting systems.\nAdapt or lose.",
+    name: "THE SPIRAL",
+    subtitle: "The last stand of Act One",
+    lore: "The breach has widened into a vortex.\nTimeline fragments are spiralling inward toward the Core — our Core.\nEvery ring they pass through tightens. Every wave is closer than the last.\n\nThis is where Act One ends.\nHold the spiral. Or lose everything that comes after.",
   },
+
+  // ── ACT 2: THE BLEED ──────────────────────────────────────────────────────
+
   6: {
-    name: "THE COMMANDER",
-    subtitle: "First organized assault",
-    lore: "Intelligence confirms it: the invasions have a commander.\nThis wave is the first fully coordinated strike.\nBrace for the mini-boss.",
+    name: "FIRST CONTACT",
+    subtitle: "They came on purpose",
+    lore: "The first breaches were accidents.\nThis one wasn't.\nSomething on the other side of the fracture found us — and sent something through deliberately.\n\nThe Bleed has begun.",
   },
   7: {
     name: "REALITY BLURS",
     subtitle: "The walls between timelines dissolve",
-    lore: "Multiple timelines are bleeding simultaneously now.\nEnemies from different realities — side by side.\nYour towers weren't designed for this.",
+    lore: "Multiple timelines are bleeding simultaneously now.\nEnemies from different realities — side by side, none of them meant to coexist.\nYour towers weren't designed for this.\n\nNeither were you. Adapt.",
   },
   8: {
     name: "THE UNSTABLE ZONE",
     subtitle: "Nothing here behaves as expected",
-    lore: "This sector of spacetime is critically unstable.\nEnemies are mutating as they pass through.\nFast-tank hybrids. Expect the unexpected.",
+    lore: "This sector of spacetime is critically unstable.\nEntities are mutating as they cross the threshold — fast-tank hybrids, things without names.\nThe rules you learned in Act One no longer apply.\n\nExpect the unexpected. Then expect worse.",
   },
   9: {
     name: "CONVERGENCE NODE",
     subtitle: "All timelines point here",
-    lore: "This is the focal point.\nEvery collapsing timeline is funneling through this single node.\nSurvive this, and we might find answers.",
+    lore: "Every collapsing timeline is funneling through this single coordinate.\nWe don't know why. We don't know what it means.\nBut whatever comes through that node next won't be small.\n\nSurvive this. Then we find answers.",
   },
   10: {
+    name: "THE COMMANDER",
+    subtitle: "It has a mind. It has a plan.",
+    lore: "Intelligence analysis confirms it: the invasions have a commander.\nNot a creature. Not an echo. Something that thinks, coordinates, and adapts.\nThis wave is its opening move.\n\nDon't let it be its only one.",
+  },
+
+  // ── ACT 3: COLLAPSE ───────────────────────────────────────────────────────
+
+  11: {
     name: "MIRROR BREACH",
     subtitle: "Fighting our own reflection",
-    lore: "The log was clear.\nThose entities bearing down on us — they're defending their homes.\nJust like we are.\nIt doesn't change what we have to do.",
-  },
-  11: {
-    name: "THE WEIGHT OF IT",
-    subtitle: "Every kill has a cost",
-    lore: "We know the truth now.\nThe other timelines know it too — they can sense our guilt.\nThey're pressing harder because of it.",
+    lore: "The data doesn't lie.\nThose entities — the ones we've been killing — they're not invaders.\nThey're defenders. From their timelines.\nProtecting their Cores the same way we're protecting ours.\n\nIt doesn't change what we have to do.",
   },
   12: {
-    name: "LAST CONFESSION",
-    subtitle: "No absolution. Only survival.",
-    lore: "The final push before Epoch Zero makes itself known.\nWhatever we've done — whatever we are — this is the consequence.\nWe hold. Or everything ends.",
+    name: "THE WEIGHT OF IT",
+    subtitle: "Every kill has a cost",
+    lore: "We know the truth now.\nSo do they — they can sense our hesitation.\nAnd they're pressing harder because of it.\n\nGuilt is a luxury. Survival isn't.",
   },
   13: {
+    name: "LAST CONFESSION",
+    subtitle: "No absolution. Only survival.",
+    lore: "This is the final push before Epoch Zero reveals itself.\nWhatever we've done — whatever we are — this is the consequence.\nThe timeline doesn't forgive. It just continues.\n\nWe hold. Or everything ends.",
+  },
+
+  // ── ACT 4: ECHO OF GUILT ──────────────────────────────────────────────────
+
+  14: {
+    name: "THE TRUTH OF IT",
+    subtitle: "We caused this",
+    lore: "The Core's final log is unambiguous.\nWe didn't discover the fracture. We caused it.\nWe overloaded the Core trying to control every timeline.\nAnd now every timeline is defending itself against us.\n\nFace it. Then fight anyway.",
+  },
+  15: {
+    name: "ECHOES OF THE FALLEN",
+    subtitle: "The dead don't stay dead here",
+    lore: "Across fractured time, nothing ends cleanly.\nEntities we destroyed in earlier timelines are returning — altered, angrier.\nThe fracture is giving them back to us.\n\nWe owe them nothing. Survive.",
+  },
+  16: {
+    name: "THE RECKONING",
+    subtitle: "The other timelines know your name",
+    lore: "They've had time to study us.\nEvery wave we've survived, every pattern we've used — they've watched.\nThis wave is a mirror of our own tactics, turned against us.\n\nYou can't out-plan yourself. So improvise.",
+  },
+
+  // ── ACT 5: EPOCH ZERO ─────────────────────────────────────────────────────
+
+  17: {
     name: "EPOCH VANGUARD",
     subtitle: "The eraser arrives",
-    lore: "EPOCH-0's advance forces are here.\nThey don't bleed. They don't fracture.\nThey simply remove what shouldn't exist.",
+    lore: "EPOCH-0 doesn't send scouts.\nIt sends certainties.\nThese units don't bleed. They don't fracture. They don't retreat.\nThey simply remove what shouldn't exist.\n\nWe shouldn't exist. Prove them wrong.",
   },
-  14: {
+  18: {
     name: "THE LAST TIMELINE",
     subtitle: "End of everything",
-    lore: "EPOCH-0 itself.\nIt has studied every wave you've survived.\nIt knows your towers. It knows your patterns.\nThis is the last timeline. Hold it.",
+    lore: "EPOCH-0 itself.\nIt has analysed every wave you've survived, every tower you've built.\nIt knows your patterns. It's already countering them.\n\nThis is the last timeline.\nNot a metaphor. Not a mission briefing.\nThe last one.\n\nHold it.",
   },
 };

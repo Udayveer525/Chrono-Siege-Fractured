@@ -1,5 +1,6 @@
 export default {
   basic: {
+    spriteKey: "tower_pulse",
     name: "PULSE",
     range: 150,
     fireRate: 800,
@@ -13,6 +14,7 @@ export default {
     description: "Balanced all-rounder. Good starting tower.",
   },
   rapid: {
+    spriteKey: "tower_storm",
     name: "STORM",
     range: 120,
     fireRate: 280,
@@ -26,6 +28,7 @@ export default {
     description: "Fast fire rate. Shreds light enemies.",
   },
   heavy: {
+    spriteKey: "tower_titan",
     name: "TITAN",
     range: 180,
     fireRate: 1400,
@@ -39,6 +42,7 @@ export default {
     description: "High damage, slow fire. Destroys tanks.",
   },
   sniper: {
+    spriteKey: "tower_apex",
     name: "APEX",
     range: 280,
     fireRate: 2000,

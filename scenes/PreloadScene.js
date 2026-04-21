@@ -40,10 +40,26 @@ export default class PreloadScene extends Phaser.Scene {
       { frameWidth: 256, frameHeight: 254 }
     );
 
+    // ── Tilemap assets ───────────────────────────────────────
+    // Tilesets
+    this.load.image("tileset_act1", "assets/tilesets/tileset_act1.png");
+
+    // Level maps — only load maps that exist
+    // Add entries here as you complete each level in Tiled
+    const maps = [
+      ["act1_level1", "assets/maps/act1_level1.json"],
+      // ["act1_level2", "assets/maps/act1_level2.json"],
+      // ["act1_level3", "assets/maps/act1_level3.json"],
+      // ["act1_level4", "assets/maps/act1_level4.json"],
+      // ["act1_level5", "assets/maps/act1_level5.json"],
+    ];
+    maps.forEach(([key, path]) => this.load.tilemapTiledJSON(key, path));
+
     // ── Audio ─────────────────────────────────────────────────────
     this.load.audio("intro",       "assets/audio/intro.wav");
     this.load.audio("sfx_orbital", "assets/audio/sfx_orbital.wav");
-    this.load.audio("sfx_shoot",    "assets/audio/sfx_shoot.wav");
+    // Uncomment when you have these files:
+    // this.load.audio("sfx_shoot",    "assets/audio/sfx_shoot.wav");
     // this.load.audio("sfx_death",    "assets/audio/sfx_death.wav");
     // this.load.audio("sfx_upgrade",  "assets/audio/sfx_upgrade.wav");
     // this.load.audio("sfx_base_hit", "assets/audio/sfx_base_hit.wav");

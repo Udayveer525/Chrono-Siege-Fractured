@@ -2,7 +2,6 @@ import SaveManager from "../managers/SaveManager.js";
 import Enemy         from "../objects/Enemy.js";
 import Tower         from "../objects/Tower.js";
 import WaveManager   from "../managers/WaveManager.js";
-import AudioManager from "../managers/AudioManager.js";
 import towersData    from "../data/towers.js";
 import { LEVELS, ENEMIES } from "../data/levels.js";
 import { ACTS, LEVEL_LORE } from "../data/story.js";
@@ -38,9 +37,9 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
-    this._buildBackground();
-    this._buildPath();
-    this._buildPads();
+    this._loadTilemap();   // tilemap → renders background, extracts path + pads
+    this._buildPath();     // builds Phaser Path from extracted points
+    this._buildPads();     // builds interactive circles from extracted positions
     this._buildBase();
 
     this.scene.launch("UIScene", { gameScene: this });
@@ -54,48 +53,134 @@ export default class GameScene extends Phaser.Scene {
     });
 
     this.waveManager = new WaveManager(this);
-
-    // Narrative intro → countdown → wave 1
     this._showLevelIntro(() => {
       this._showCountdown(3, () => this.waveManager.startWave());
     });
   }
 
-  // ─── BACKGROUND ─────────────────────────────────────────────────
-  _buildBackground() {
-    const g = this.add.graphics();
-    g.lineStyle(1, this.levelData.pathColor, 0.04);
-    for (let x=0;x<=W;x+=50) g.lineBetween(x,0,x,H);
-    for (let y=0;y<=H;y+=50) g.lineBetween(0,y,W,y);
-    g.lineStyle(2, this.levelData.pathColor, 0.28);
+  // ─── TILEMAP ────────────────────────────────────────────────────
+  // Loads the Tiled map for this level.
+  // Extracts this.pathPoints (from EnemyPath object layer polyline)
+  // and this.padPositions  (from BuildPads tile layer).
+  // If no map is loaded yet for this level, falls back to empty arrays
+  // and logs a warning — the level won't be playable but won't crash.
+  _loadTilemap() {
+    const mapKey = this.levelData.mapKey;
+    const color  = this.levelData.pathColor;
+
+    // ── Check map is loaded ───────────────────────────────────────
+    if (!this.cache.tilemap.has(mapKey)) {
+      console.warn(`[GameScene] No tilemap loaded for key "${mapKey}". ` +
+        `Export the Tiled map and add it to PreloadScene.`);
+      // Draw a plain background so game doesn't look broken
+      this._buildFallbackBackground(color);
+      this.pathPoints   = [];
+      this.padPositions = [];
+      return;
+    }
+
+    // ── Create tilemap ────────────────────────────────────────────
+    const map = this.make.tilemap({ key: mapKey });
+
+    // Tileset name in Tiled must match the image key we loaded.
+    // The first arg is the name as it appears inside the JSON "tilesets" array.
+    // The second arg is the key we used in this.load.image().
+    const tileset = map.addTilesetImage("tileset_act1", "tileset_act1");
+
+    // ── Render tile layers ────────────────────────────────────────
+    // Base layer — the floor and environment tiles
+    if (map.getLayer("Base")) {
+      map.createLayer("Base", tileset, 0, 0).setDepth(0);
+    }
+    // Path layer — the decorative route tiles (visual only)
+    if (map.getLayer("Path")) {
+      map.createLayer("Path", tileset, 0, 0).setDepth(1);
+    }
+    // BuildPads layer — circular pad tiles (visual; we also extract positions)
+    if (map.getLayer("BuildPads")) {
+      map.createLayer("BuildPads", tileset, 0, 0).setDepth(1);
+    }
+
+    // ── Extract path waypoints from EnemyPath object layer ────────
+    this.pathPoints = [];
+    const pathObjLayer = map.getObjectLayer("EnemyPath");
+    if (pathObjLayer && pathObjLayer.objects.length > 0) {
+      const polyObj = pathObjLayer.objects[0]; // first (and only) polyline object
+      if (polyObj.polyline) {
+        this.pathPoints = polyObj.polyline.map(pt => ({
+          x: pt.x + polyObj.x,
+          y: pt.y + polyObj.y,
+        }));
+      }
+    } else {
+      console.warn(`[GameScene] "EnemyPath" object layer not found in ${mapKey}`);
+    }
+
+    // ── Extract pad positions from BuildPads tile layer ───────────
+    // Use forEachTile — any non-empty tile in that layer = a pad location
+    this.padPositions = [];
+    const padTileLayer = map.getLayer("BuildPads");
+    if (padTileLayer) {
+      map.getLayer("BuildPads").tilemapLayer.forEachTile(tile => {
+        if (tile.index !== -1) {
+          this.padPositions.push({
+            x: tile.getCenterX(),
+            y: tile.getCenterY(),
+          });
+        }
+      });
+    }
+
+    // ── Corner accent graphics on top of tilemap ──────────────────
+    const cg = this.add.graphics().setDepth(10);
+    cg.lineStyle(2, color, 0.3);
     const cs = 28;
     [[0,0],[W,0],[0,H],[W,H]].forEach(([cx,cy]) => {
+      const dx=cx===0?1:-1, dy=cy===0?1:-1;
+      cg.lineBetween(cx,cy,cx+dx*cs,cy); cg.lineBetween(cx,cy,cx,cy+dy*cs);
+    });
+  }
+
+  _buildFallbackBackground(color) {
+    // Shown when no tilemap is available for this level yet
+    const g = this.add.graphics();
+    g.fillStyle(0x04040d); g.fillRect(0, 0, W, H);
+    g.lineStyle(1, color, 0.04);
+    for (let x=0;x<=W;x+=50) g.lineBetween(x,0,x,H);
+    for (let y=0;y<=H;y+=50) g.lineBetween(0,y,W,y);
+    g.lineStyle(2, color, 0.28);
+    const cs=28;
+    [[0,0],[W,0],[0,H],[W,H]].forEach(([cx,cy])=>{
       const dx=cx===0?1:-1, dy=cy===0?1:-1;
       g.lineBetween(cx,cy,cx+dx*cs,cy); g.lineBetween(cx,cy,cx,cy+dy*cs);
     });
   }
 
   // ─── PATH ───────────────────────────────────────────────────────
+  // Builds the Phaser Path object from this.pathPoints.
+  // If pathPoints is empty (no tilemap), creates a dummy path so
+  // the rest of the game doesn't crash.
   _buildPath() {
-    const pts = this.levelData.pathPoints;
+    const pts   = this.pathPoints;
+    const color = this.levelData.pathColor;
+
+    if (pts.length < 2) {
+      // No map yet — make a flat dummy path so enemies have somewhere to go
+      this.path = this.add.path(0, H/2);
+      this.path.lineTo(W, H/2);
+      return;
+    }
+
     this.path = this.add.path(pts[0].x, pts[0].y);
-    for (let i=1;i<pts.length;i++) this.path.lineTo(pts[i].x, pts[i].y);
+    for (let i=1; i<pts.length; i++) this.path.lineTo(pts[i].x, pts[i].y);
 
-    const glow = this.add.graphics();
-    glow.lineStyle(16, this.levelData.pathColor, 0.06);
-    this.path.draw(glow);
-
-    const line = this.add.graphics();
-    line.lineStyle(3, this.levelData.pathColor, 0.65);
-    this.path.draw(line);
-
-    // Direction arrows
-    const ag = this.add.graphics();
-    ag.fillStyle(this.levelData.pathColor, 0.2);
-    for (let i=2;i<32;i++) {
+    // Direction arrows along the path
+    const ag = this.add.graphics().setDepth(2);
+    ag.fillStyle(color, 0.22);
+    for (let i=2; i<32; i++) {
       const t=i/32, pt=this.path.getPoint(t), p2=this.path.getPoint(Math.min(t+0.01,1));
       if (!pt||!p2) continue;
-      const a=Math.atan2(p2.y-pt.y,p2.x-pt.x),s=5;
+      const a=Math.atan2(p2.y-pt.y, p2.x-pt.x), s=5;
       ag.fillTriangle(
         pt.x+Math.cos(a)*s,         pt.y+Math.sin(a)*s,
         pt.x+Math.cos(a+2.4)*s*0.6, pt.y+Math.sin(a+2.4)*s*0.6,
@@ -106,31 +191,52 @@ export default class GameScene extends Phaser.Scene {
 
   // ─── BUILD PADS ─────────────────────────────────────────────────
   _buildPads() {
-    this.buildPads = [];
-    this.levelData.buildPads.forEach((pos) => {
-      const pad = this.add.circle(pos.x, pos.y, 20, COLORS.pad);
-      pad.setStrokeStyle(1.5, COLORS.padStroke).setAlpha(0.65).setInteractive();
-      pad.hasTower = false;
-
-      const mark = this.add.graphics();
-      mark.lineStyle(1, this.levelData.pathColor, 0.22);
-      mark.lineBetween(pos.x-7,pos.y,pos.x+7,pos.y);
-      mark.lineBetween(pos.x,pos.y-7,pos.x,pos.y+7);
-
-      pad.on("pointerover", () => { if (!pad.hasTower) { pad.setAlpha(1); pad.setStrokeStyle(2,COLORS.padStroke); } });
-      pad.on("pointerout",  () => { if (!pad.hasTower) { pad.setAlpha(0.65); pad.setStrokeStyle(1.5,COLORS.padStroke); } });
-      pad.on("pointerdown", () => {
-        if (this.gameOver || this._orbitalTargeting) return;
-        if (pad.hasTower) { this.showMessage("Pad occupied!"); return; }
-        this.closeTowerMenu(); this.openBuildMenu(pad);
-      });
-      this.buildPads.push(pad);
+  this.buildPads = [];
+  this.padPositions.forEach((pos) => {
+    
+    const pad = this.add.circle(pos.x, pos.y, 32, 0x00ffcc, 0.001);
+    pad.setDepth(5);
+    
+    // FIXED: Centered hit area + changed mouse cursor
+    pad.setInteractive({
+        hitArea: new Phaser.Geom.Circle(32, 32, 26),
+        hitAreaCallback: Phaser.Geom.Circle.Contains,
+        useHandCursor: true // Changes the mouse icon!
     });
-  }
+    
+    pad.hasTower = false;
+
+    const glow = this.add.circle(pos.x, pos.y, 26, 0x00ffcc, 0)
+      .setStrokeStyle(2, 0x00ffcc, 0).setDepth(4);
+
+    pad.on("pointerover", () => {
+      if (pad.hasTower) return;
+      glow.setFillStyle(0x00ffcc, 0.15);
+      glow.setStrokeStyle(2, 0x00ffcc, 0.6);
+    });
+    
+    pad.on("pointerout", () => {
+      glow.setFillStyle(0x00ffcc, 0);
+      glow.setStrokeStyle(2, 0x00ffcc, 0);
+    });
+    
+    pad.on("pointerdown", () => {
+      if (this.gameOver || this._orbitalTargeting) return;
+      if (pad.hasTower) { this.showMessage("Pad occupied!"); return; }
+      this.closeTowerMenu(); 
+      this.openBuildMenu(pad);
+    });
+
+    pad._glow = glow;
+    this.buildPads.push(pad);
+  });
+}
 
   // ─── BASE ────────────────────────────────────────────────────────
   _buildBase() {
-    const last = this.levelData.pathPoints[this.levelData.pathPoints.length-1];
+    // Base sits at the end of the path
+    const pts  = this.pathPoints;
+    const last = pts.length > 0 ? pts[pts.length - 1] : { x: W - 80, y: H / 2 };
     this.baseX = last.x; this.baseY = last.y;
 
     // Glow ring underneath
@@ -277,7 +383,8 @@ export default class GameScene extends Phaser.Scene {
       btn.on("pointerdown", () => {
         if(this.gold < cfg.cost){ this.showMessage("Not enough gold!"); return; }
         const tower=this.placeTower(pad.x,pad.y,type);
-        pad.tower=tower; pad.hasTower=true; pad.setAlpha(1);
+        pad.tower=tower; pad.hasTower=true;
+        if (pad._glow) pad._glow.setFillStyle(0,0).setStrokeStyle(0,0,0);
         this.closeBuildMenu(); this.events.emit("hideTooltip");
       });
 
@@ -364,7 +471,7 @@ export default class GameScene extends Phaser.Scene {
     sellBtn.on("pointerdown", ()=>{
       this.gold+=sellVal; this.events.emit("goldUpdate",this.gold);
       const pad=this.buildPads.find(p=>p.tower===tower);
-      if(pad){ pad.hasTower=false; pad.tower=null; pad.setAlpha(0.65); }
+      if(pad){ pad.hasTower=false; pad.tower=null; }
       tower.destroy(); this.towers.splice(this.towers.indexOf(tower),1);
       this.closeTowerMenu(); this.showMessage(`Sold for ⬡ ${sellVal}`);
     });
@@ -431,9 +538,6 @@ export default class GameScene extends Phaser.Scene {
     const burst=this.add.circle(x,y,radius*0.3,0xffffff,0.9).setDepth(30).setScale(0.1);
     const ring1=this.add.circle(x,y,radius,0xcc88ff,0.5).setDepth(30).setScale(0.1);
     const ring2=this.add.circle(x,y,radius*1.2,0x8844ff,0.3).setDepth(29).setScale(0.1);
-
-    AudioManager.playSFX("sfx_orbital", 0.3);
-
     this.tweens.add({targets:burst,scaleX:1,scaleY:1,alpha:0,duration:250,ease:"Quad.Out",onComplete:()=>burst.destroy()});
     this.tweens.add({targets:ring1,scaleX:1,scaleY:1,alpha:0,duration:420,ease:"Quad.Out",onComplete:()=>ring1.destroy()});
     this.tweens.add({targets:ring2,scaleX:1,scaleY:1,alpha:0,duration:600,ease:"Quad.Out",onComplete:()=>ring2.destroy()});
@@ -527,12 +631,12 @@ export default class GameScene extends Phaser.Scene {
           }
         });
       }
-    } else {
-      this.base.setFillStyle(0xff0000);
-      this.time.delayedCall(110, () => { if (this.base?.active) this.base.setFillStyle(COLORS.base); });
       // Brief red tint
       this.base.setTint(0xff6666);
       this.time.delayedCall(200, () => { if (this.base?.active) this.base.clearTint(); });
+    } else {
+      this.base.setFillStyle(0xff0000);
+      this.time.delayedCall(110, () => { if (this.base?.active) this.base.setFillStyle(COLORS.base); });
     }
 
     this.baseHP -= amount;

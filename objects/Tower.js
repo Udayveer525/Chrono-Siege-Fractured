@@ -23,7 +23,7 @@ export default class Tower {
     if (hasSprite) {
       this.sprite = scene.add.sprite(x, y, spriteKey);
       // Scale to fit a ~40px footprint
-      const scale = 40 / this.sprite.height;
+      const scale = 80 / this.sprite.height;
       this.sprite.setScale(scale);
       this.sprite.setDepth(5);
       if (scene.anims.exists(idleAnim)) this.sprite.play(idleAnim);

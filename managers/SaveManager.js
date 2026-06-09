@@ -17,6 +17,8 @@ const DEFAULT = {
   bestScores: {},
   totalScore: 0,
   firstRun:   true,
+  sfxVolume:  0.7,
+  musicVolume: 0.45,
 };
 
 export default class SaveManager {
@@ -53,6 +55,13 @@ export default class SaveManager {
 
   static isFirstRun() {
     return this.load().firstRun;
+  }
+
+  static updateSettings(settings) {
+    const data = this.load();
+    if (settings.sfxVolume !== undefined) data.sfxVolume = settings.sfxVolume;
+    if (settings.musicVolume !== undefined) data.musicVolume = settings.musicVolume;
+    this.save(data);
   }
 
   static reset() {

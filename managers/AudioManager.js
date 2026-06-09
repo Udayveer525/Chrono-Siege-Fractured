@@ -1,3 +1,5 @@
+import SaveManager from "./SaveManager.js";
+
 const AudioManager = {
   _sound:        null,
   _scene:        null,
@@ -29,8 +31,11 @@ const AudioManager = {
     }
   },
 
-  playMusic(key, volume = 0.45) {
+  playMusic(key, overrideVolume = null) {
     if (!this._sound) return;
+
+    // Use default volume from settings if override not provided
+    const volume = overrideVolume !== null ? overrideVolume : SaveManager.load().musicVolume;
 
     // Update scene reference in case we're called after a scene switch
     if (!this._ready) {
@@ -92,13 +97,23 @@ const AudioManager = {
     } catch(e) {}
   },
 
-  playSFX(key, volume = 0.7) {
+  playSFX(key, overrideVolume = null) {
     if (!this._sound || !this._ready) return;
+    
+    // Use default volume from settings if override not provided
+    const volume = overrideVolume !== null ? overrideVolume : SaveManager.load().sfxVolume;
+
     // Guard: only play if the asset is actually loaded
     if (!this._scene?.cache?.audio?.has(key)) return;
     try {
       this._sound.play(key, { volume });
     } catch(e) {}
+  },
+
+  setMusicVolume(volume) {
+    if (this._currentMusic && this._currentMusic.isPlaying) {
+      this._currentMusic.setVolume(volume);
+    }
   },
 
   updateScene(scene) {

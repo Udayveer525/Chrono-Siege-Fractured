@@ -50,7 +50,7 @@ export default class WaveManager {
     });
   }
 
-  update() {
+  update(dt = 16) {
     // Wave cleared — start between-wave timer
     if (this.waitingForClear && this.scene.enemies.length === 0) {
       this.waitingForClear = false;
@@ -61,7 +61,7 @@ export default class WaveManager {
 
     // Count down to next wave
     if (this._betweenWaves) {
-      this._elapsed += 16;
+      this._elapsed += dt;
       const remaining = Math.max(0, Math.ceil((this._nextWaveDelay - this._elapsed) / 1000));
       this.scene.setWaveStatus(`NEXT WAVE IN ${remaining}s  —  REINFORCE YOUR DEFENCES`);
 

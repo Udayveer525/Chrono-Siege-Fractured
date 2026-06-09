@@ -212,8 +212,22 @@ export default class BootScene extends Phaser.Scene {
     rstBtn.on("pointerover", () => rstBtn.setColor("#445566"));
     rstBtn.on("pointerout", () => rstBtn.setColor("#99bbcc"));
     rstBtn.on("pointerdown", () => {
-      SaveManager.reset();
-      this.scene.restart();
+      this._showResetConfirm();
+    });
+
+    // SETTINGS button
+    const setBtn = this.add
+      .text(W / 2, 540, "Settings", {
+        fontSize: "13px",
+        fontFamily: "'Share Tech Mono', monospace",
+        color: "#99bbcc",
+      })
+      .setOrigin(0.5)
+      .setInteractive();
+    setBtn.on("pointerover", () => setBtn.setColor("#445566"));
+    setBtn.on("pointerout", () => setBtn.setColor("#99bbcc"));
+    setBtn.on("pointerdown", () => {
+      this._showSettings();
     });
 
     this.add
@@ -261,5 +275,83 @@ export default class BootScene extends Phaser.Scene {
   _go(fn) {
     this.cameras.main.fade(380, 0, 0, 0);
     this.time.delayedCall(400, fn);
+  }
+
+  _showResetConfirm() {
+    const overlay = this.add.container(0, 0).setDepth(100);
+    overlay.add(this.add.rectangle(W/2, H/2, W, H, 0x000000, 0.85).setInteractive());
+    
+    const panel = this.add.rectangle(W/2, H/2, 360, 200, 0x0a0a1a).setStrokeStyle(2, 0xff2222, 0.6);
+    overlay.add(panel);
+
+    overlay.add(this.add.text(W/2, H/2 - 50, "RESET PROGRESS?", {
+      fontSize: "24px", fontFamily: "'Orbitron', sans-serif", color: "#ff4444", fontStyle: "bold"
+    }).setOrigin(0.5));
+
+    overlay.add(this.add.text(W/2, H/2 - 10, "This action cannot be undone.", {
+      fontSize: "14px", fontFamily: "'Share Tech Mono', monospace", color: "#888"
+    }).setOrigin(0.5));
+
+    const yesBtn = this.add.rectangle(W/2 - 70, H/2 + 50, 100, 40, 0x330000).setStrokeStyle(1, 0xff4444).setInteractive();
+    overlay.add(yesBtn);
+    overlay.add(this.add.text(W/2 - 70, H/2 + 50, "YES", { fontSize: "14px", fontFamily: "'Orbitron', sans-serif", color: "#ff4444" }).setOrigin(0.5));
+
+    const noBtn = this.add.rectangle(W/2 + 70, H/2 + 50, 100, 40, 0x002211).setStrokeStyle(1, 0x00ff44).setInteractive();
+    overlay.add(noBtn);
+    overlay.add(this.add.text(W/2 + 70, H/2 + 50, "NO", { fontSize: "14px", fontFamily: "'Orbitron', sans-serif", color: "#00ff44" }).setOrigin(0.5));
+
+    yesBtn.on("pointerdown", () => {
+      SaveManager.reset();
+      this.scene.restart();
+    });
+
+    noBtn.on("pointerdown", () => overlay.destroy());
+  }
+
+  _showSettings() {
+    const overlay = this.add.container(0, 0).setDepth(100);
+    overlay.add(this.add.rectangle(W/2, H/2, W, H, 0x000000, 0.85).setInteractive());
+    
+    const panel = this.add.rectangle(W/2, H/2, 400, 320, 0x050510).setStrokeStyle(2, 0x00ffcc, 0.6);
+    overlay.add(panel);
+
+    overlay.add(this.add.text(W/2, H/2 - 110, "SETTINGS", {
+      fontSize: "32px", fontFamily: "'Orbitron', sans-serif", color: "#00ffcc", fontStyle: "bold"
+    }).setOrigin(0.5));
+
+    const save = SaveManager.load();
+    let { sfxVolume, musicVolume } = save;
+
+    const createVolumeControl = (y, label, initialValue, onUpdate) => {
+      overlay.add(this.add.text(W/2, y - 20, label, { fontSize: "14px", fontFamily: "'Share Tech Mono', monospace", color: "#888" }).setOrigin(0.5));
+      
+      const valTxt = this.add.text(W/2, y, `${Math.round(initialValue * 100)}%`, { fontSize: "20px", fontFamily: "'Orbitron', sans-serif", color: "#fff" }).setOrigin(0.5);
+      overlay.add(valTxt);
+      
+      const minus = this.add.text(W/2 - 60, y, "-", { fontSize: "24px", color: "#ff4444" }).setOrigin(0.5).setInteractive();
+      const plus = this.add.text(W/2 + 60, y, "+", { fontSize: "24px", color: "#44ff44" }).setOrigin(0.5).setInteractive();
+      
+      let val = initialValue;
+      minus.on("pointerdown", () => {
+        val = Math.max(0, val - 0.1);
+        valTxt.setText(`${Math.round(val * 100)}%`);
+        onUpdate(val);
+      });
+      plus.on("pointerdown", () => {
+        val = Math.min(1, val + 0.1);
+        valTxt.setText(`${Math.round(val * 100)}%`);
+        onUpdate(val);
+      });
+      overlay.add([minus, plus]);
+    };
+
+    createVolumeControl(H/2 - 30, "SFX VOLUME", sfxVolume, (v) => { SaveManager.updateSettings({ sfxVolume: v }); AudioManager.playSFX("sfx_shoot", 0.3); });
+    createVolumeControl(H/2 + 40, "MUSIC VOLUME", musicVolume, (v) => { SaveManager.updateSettings({ musicVolume: v }); AudioManager.setMusicVolume(v); });
+
+    const closeBtn = this.add.rectangle(W/2, H/2 + 110, 200, 40, 0x002211).setStrokeStyle(1, 0x00ff44).setInteractive();
+    overlay.add(closeBtn);
+    overlay.add(this.add.text(W/2, H/2 + 110, "CLOSE", { fontSize: "14px", fontFamily: "'Orbitron', sans-serif", color: "#00ff44" }).setOrigin(0.5));
+
+    closeBtn.on("pointerdown", () => overlay.destroy());
   }
 }

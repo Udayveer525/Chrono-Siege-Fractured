@@ -123,10 +123,15 @@ export default class ActHubScene extends Phaser.Scene {
 
     const btnY = cy + ch/2 - 40;
     if (!isUnlocked) {
-      this.add.rectangle(cx, btnY, cw-30, 44, 0x0a0a14).setStrokeStyle(1, 0x334444, 0.4);
-      this.add.text(cx, btnY-8, "🔒  LOCKED", {
-        fontSize: "13px", fontFamily: "'Orbitron', sans-serif", color: "#334455",
-      }).setOrigin(0.5);
+      // Draw a restricted access belt over the card
+      const belt = this.add.rectangle(cx, cy, cw + 20, 36, 0x440000)
+        .setAngle(-12).setAlpha(0.8).setStrokeStyle(2, 0xff0000, 0.4);
+      
+      const restrictionText = this.add.text(cx, cy, "// RESTRICTED //", {
+        fontSize: "18px", fontFamily: "'Orbitron', sans-serif",
+        color: "#ff3333", fontStyle: "bold", letterSpacing: 2
+      }).setOrigin(0.5).setAngle(-12).setAlpha(0.9);
+
       // Tell the player exactly what they need to do
       const actIndex = ACTS.indexOf(act);
       const prevAct  = ACTS[actIndex - 1];

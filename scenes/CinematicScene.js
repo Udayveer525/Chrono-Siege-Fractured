@@ -31,10 +31,14 @@ export default class CinematicScene extends Phaser.Scene {
     this._topBar = this.add.rectangle(W/2, barH/2,      W, barH, 0x000000).setDepth(10);
     this._botBar = this.add.rectangle(W/2, H - barH/2,  W, barH, 0x000000).setDepth(10);
 
-    // Skip hint
-    this._skipHint = this.add.text(W - 20, H - barH/2, "SPACE / CLICK TO SKIP", {
-      fontSize: "11px", fontFamily: "'Share Tech Mono', monospace", color: "#333333",
-    }).setOrigin(1, 0.5).setDepth(11);
+    // Skip button
+    this._skipHint = this.add.text(W - 20, H - barH/2, "SKIP ⏭", {
+      fontSize: "14px", fontFamily: "'Orbitron', sans-serif", color: "#666666",
+    }).setOrigin(1, 0.5).setDepth(11).setInteractive();
+
+    this._skipHint.on("pointerover", () => this._skipHint.setColor("#ffffff"));
+    this._skipHint.on("pointerout", () => this._skipHint.setColor("#666666"));
+    this._skipHint.on("pointerdown", () => this._skip());
 
     // Animated background — slow particle drift
     this._buildParticles();
@@ -49,9 +53,8 @@ export default class CinematicScene extends Phaser.Scene {
     this._lines    = [];           // active text objects
     this._running  = true;
 
-    // Global skip
+    // Global skip only via SPACE now
     this.input.keyboard.on("keydown-SPACE", () => this._skip());
-    this.input.on("pointerdown", () => this._skip());
 
     // Play the script
     this._playScript(this.act.cinematic, 0);

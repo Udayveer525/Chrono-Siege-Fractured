@@ -59,13 +59,18 @@ export default class PreloadScene extends Phaser.Scene {
       ["act1_level1", "assets/maps/act1_level1.json"],
       ["act1_level2", "assets/maps/act1_level2.json"],
       ["act1_level3", "assets/maps/act1_level3.json"],
-      // ["act1_level4", "assets/maps/act1_level4.json"],
-      // ["act1_level5", "assets/maps/act1_level5.json"],
+      ["act1_level4", "assets/maps/act1_level4.json"],
+      ["act1_level5", "assets/maps/act1_level5.json"],
     ];
     maps.forEach(([key, path]) => this.load.tilemapTiledJSON(key, path));
 
     // ── Audio ─────────────────────────────────────────────────────
     this.load.audio("intro", "assets/audio/intro.wav");
+    this.load.audio("music_act1", "assets/audio/music_act1.mp3");
+
+    // UI & Banners
+    this.load.image("banner_restricted", "assets/ui/banner_restricted.png");
+    this.load.image("banner_coming_soon", "assets/ui/banner_coming_soon.png");
     this.load.audio("sfx_orbital", "assets/audio/sfx_orbital.mp3");
     this.load.audio("sfx_shoot", "assets/audio/sfx_shoot.mp3");
     this.load.audio("sfx_death", "assets/audio/sfx_death.mp3");

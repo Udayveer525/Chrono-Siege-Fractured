@@ -16,7 +16,7 @@ export default class BootScene extends Phaser.Scene {
     // Update AudioManager's scene reference so fade tweens work here,
     // then queue the music (plays after first user gesture automatically)
     AudioManager.updateScene(this);
-    AudioManager.playMusic("intro");
+    AudioManager.playMusic("music_act1");
   }
 
   _buildAnimatedBg() {
@@ -279,26 +279,26 @@ export default class BootScene extends Phaser.Scene {
 
   _showResetConfirm() {
     const overlay = this.add.container(0, 0).setDepth(100);
-    overlay.add(this.add.rectangle(W/2, H/2, W, H, 0x000000, 0.85).setInteractive());
-    
-    const panel = this.add.rectangle(W/2, H/2, 360, 200, 0x0a0a1a).setStrokeStyle(2, 0xff2222, 0.6);
+    overlay.add(this.add.rectangle(W / 2, H / 2, W, H, 0x000000, 0.85).setInteractive());
+
+    const panel = this.add.rectangle(W / 2, H / 2, 360, 200, 0x0a0a1a).setStrokeStyle(2, 0xff2222, 0.6);
     overlay.add(panel);
 
-    overlay.add(this.add.text(W/2, H/2 - 50, "RESET PROGRESS?", {
+    overlay.add(this.add.text(W / 2, H / 2 - 50, "RESET PROGRESS?", {
       fontSize: "24px", fontFamily: "'Orbitron', sans-serif", color: "#ff4444", fontStyle: "bold"
     }).setOrigin(0.5));
 
-    overlay.add(this.add.text(W/2, H/2 - 10, "This action cannot be undone.", {
+    overlay.add(this.add.text(W / 2, H / 2 - 10, "This action cannot be undone.", {
       fontSize: "14px", fontFamily: "'Share Tech Mono', monospace", color: "#888"
     }).setOrigin(0.5));
 
-    const yesBtn = this.add.rectangle(W/2 - 70, H/2 + 50, 100, 40, 0x330000).setStrokeStyle(1, 0xff4444).setInteractive();
+    const yesBtn = this.add.rectangle(W / 2 - 70, H / 2 + 50, 100, 40, 0x330000).setStrokeStyle(1, 0xff4444).setInteractive();
     overlay.add(yesBtn);
-    overlay.add(this.add.text(W/2 - 70, H/2 + 50, "YES", { fontSize: "14px", fontFamily: "'Orbitron', sans-serif", color: "#ff4444" }).setOrigin(0.5));
+    overlay.add(this.add.text(W / 2 - 70, H / 2 + 50, "YES", { fontSize: "14px", fontFamily: "'Orbitron', sans-serif", color: "#ff4444" }).setOrigin(0.5));
 
-    const noBtn = this.add.rectangle(W/2 + 70, H/2 + 50, 100, 40, 0x002211).setStrokeStyle(1, 0x00ff44).setInteractive();
+    const noBtn = this.add.rectangle(W / 2 + 70, H / 2 + 50, 100, 40, 0x002211).setStrokeStyle(1, 0x00ff44).setInteractive();
     overlay.add(noBtn);
-    overlay.add(this.add.text(W/2 + 70, H/2 + 50, "NO", { fontSize: "14px", fontFamily: "'Orbitron', sans-serif", color: "#00ff44" }).setOrigin(0.5));
+    overlay.add(this.add.text(W / 2 + 70, H / 2 + 50, "NO", { fontSize: "14px", fontFamily: "'Orbitron', sans-serif", color: "#00ff44" }).setOrigin(0.5));
 
     yesBtn.on("pointerdown", () => {
       SaveManager.reset();
@@ -310,12 +310,12 @@ export default class BootScene extends Phaser.Scene {
 
   _showSettings() {
     const overlay = this.add.container(0, 0).setDepth(100);
-    overlay.add(this.add.rectangle(W/2, H/2, W, H, 0x000000, 0.85).setInteractive());
-    
-    const panel = this.add.rectangle(W/2, H/2, 400, 320, 0x050510).setStrokeStyle(2, 0x00ffcc, 0.6);
+    overlay.add(this.add.rectangle(W / 2, H / 2, W, H, 0x000000, 0.85).setInteractive());
+
+    const panel = this.add.rectangle(W / 2, H / 2, 400, 320, 0x050510).setStrokeStyle(2, 0x00ffcc, 0.6);
     overlay.add(panel);
 
-    overlay.add(this.add.text(W/2, H/2 - 110, "SETTINGS", {
+    overlay.add(this.add.text(W / 2, H / 2 - 110, "SETTINGS", {
       fontSize: "32px", fontFamily: "'Orbitron', sans-serif", color: "#00ffcc", fontStyle: "bold"
     }).setOrigin(0.5));
 
@@ -323,14 +323,14 @@ export default class BootScene extends Phaser.Scene {
     let { sfxVolume, musicVolume } = save;
 
     const createVolumeControl = (y, label, initialValue, onUpdate) => {
-      overlay.add(this.add.text(W/2, y - 20, label, { fontSize: "14px", fontFamily: "'Share Tech Mono', monospace", color: "#888" }).setOrigin(0.5));
-      
-      const valTxt = this.add.text(W/2, y, `${Math.round(initialValue * 100)}%`, { fontSize: "20px", fontFamily: "'Orbitron', sans-serif", color: "#fff" }).setOrigin(0.5);
+      overlay.add(this.add.text(W / 2, y - 20, label, { fontSize: "14px", fontFamily: "'Share Tech Mono', monospace", color: "#888" }).setOrigin(0.5));
+
+      const valTxt = this.add.text(W / 2, y, `${Math.round(initialValue * 100)}%`, { fontSize: "20px", fontFamily: "'Orbitron', sans-serif", color: "#fff" }).setOrigin(0.5);
       overlay.add(valTxt);
-      
-      const minus = this.add.text(W/2 - 60, y, "-", { fontSize: "24px", color: "#ff4444" }).setOrigin(0.5).setInteractive();
-      const plus = this.add.text(W/2 + 60, y, "+", { fontSize: "24px", color: "#44ff44" }).setOrigin(0.5).setInteractive();
-      
+
+      const minus = this.add.text(W / 2 - 60, y, "-", { fontSize: "24px", color: "#ff4444" }).setOrigin(0.5).setInteractive();
+      const plus = this.add.text(W / 2 + 60, y, "+", { fontSize: "24px", color: "#44ff44" }).setOrigin(0.5).setInteractive();
+
       let val = initialValue;
       minus.on("pointerdown", () => {
         val = Math.max(0, val - 0.1);
@@ -345,12 +345,12 @@ export default class BootScene extends Phaser.Scene {
       overlay.add([minus, plus]);
     };
 
-    createVolumeControl(H/2 - 30, "SFX VOLUME", sfxVolume, (v) => { SaveManager.updateSettings({ sfxVolume: v }); AudioManager.playSFX("sfx_shoot", 0.3); });
-    createVolumeControl(H/2 + 40, "MUSIC VOLUME", musicVolume, (v) => { SaveManager.updateSettings({ musicVolume: v }); AudioManager.setMusicVolume(v); });
+    createVolumeControl(H / 2 - 30, "SFX VOLUME", sfxVolume, (v) => { SaveManager.updateSettings({ sfxVolume: v }); AudioManager.playSFX("sfx_shoot", 0.3); });
+    createVolumeControl(H / 2 + 40, "MUSIC VOLUME", musicVolume, (v) => { SaveManager.updateSettings({ musicVolume: v }); AudioManager.setMusicVolume(v); });
 
-    const closeBtn = this.add.rectangle(W/2, H/2 + 110, 200, 40, 0x002211).setStrokeStyle(1, 0x00ff44).setInteractive();
+    const closeBtn = this.add.rectangle(W / 2, H / 2 + 110, 200, 40, 0x002211).setStrokeStyle(1, 0x00ff44).setInteractive();
     overlay.add(closeBtn);
-    overlay.add(this.add.text(W/2, H/2 + 110, "CLOSE", { fontSize: "14px", fontFamily: "'Orbitron', sans-serif", color: "#00ff44" }).setOrigin(0.5));
+    overlay.add(this.add.text(W / 2, H / 2 + 110, "CLOSE", { fontSize: "14px", fontFamily: "'Orbitron', sans-serif", color: "#00ff44" }).setOrigin(0.5));
 
     closeBtn.on("pointerdown", () => overlay.destroy());
   }

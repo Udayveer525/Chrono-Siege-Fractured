@@ -123,25 +123,8 @@ export default class ActHubScene extends Phaser.Scene {
 
     const btnY = cy + ch/2 - 40;
     if (!isUnlocked) {
-      // Draw a restricted access belt over the card
-      const belt = this.add.rectangle(cx, cy, cw + 20, 36, 0x440000)
-        .setAngle(-12).setAlpha(0.8).setStrokeStyle(2, 0xff0000, 0.4);
-      
-      const restrictionText = this.add.text(cx, cy, "// RESTRICTED //", {
-        fontSize: "18px", fontFamily: "'Orbitron', sans-serif",
-        color: "#ff3333", fontStyle: "bold", letterSpacing: 2
-      }).setOrigin(0.5).setAngle(-12).setAlpha(0.9);
-
-      // Tell the player exactly what they need to do
-      const actIndex = ACTS.indexOf(act);
-      const prevAct  = ACTS[actIndex - 1];
-      const remaining = prevAct
-        ? prevAct.levelIds.filter(id => !save.completed.includes(id)).length
-        : 0;
-      this.add.text(cx, btnY+10,
-        `Finish Act ${prevAct?.id}: ${remaining} mission${remaining!==1?"s":""} left`, {
-        fontSize: "10px", fontFamily: "'Share Tech Mono', monospace", color: "#334444",
-      }).setOrigin(0.5);
+      const banner = this.add.sprite(cx, cy, "banner_coming_soon").setAngle(-12);
+      banner.setScale((cw + 20) / banner.width);
     } else if (isComplete) {
       this.add.rectangle(cx, btnY, cw-30, 44, 0x001a00).setStrokeStyle(1.5, act.color, 0.6);
       this.add.text(cx, btnY, "✓  COMPLETED", {

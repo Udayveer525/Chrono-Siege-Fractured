@@ -8,6 +8,7 @@ import { W, H }             from "./GameScene.js";
 import { ACTS, LEVEL_LORE } from "../data/story.js";
 import { LEVELS }           from "../data/levels.js";
 import SaveManager          from "../managers/SaveManager.js";
+import AudioManager         from "../managers/AudioManager.js";
 
 const CARD_W    = 360;
 const CARD_H    = 500;
@@ -34,6 +35,10 @@ export default class LevelSelectScene extends Phaser.Scene {
     this._buildAllCards(save);
     this._buildUI(save);
     this._setupInput();
+
+    if (this.act.id === 1) {
+      AudioManager.playMusic("music_act1");
+    }
 
     this.cameras.main.scrollX = 0;
   }
@@ -102,8 +107,10 @@ export default class LevelSelectScene extends Phaser.Scene {
 
     // lore or lock message
     if (locked) {
-      this.add.text(cx, cy - 10, "🔒", { fontSize: "36px" }).setOrigin(0.5);
-      this.add.text(cx, cy + 42, "Complete the previous\nmission to unlock.", {
+      const banner = this.add.sprite(cx, cy, "banner_restricted").setAngle(-12);
+      banner.setScale((cw + 20) / banner.width);
+
+      this.add.text(cx, cy + 60, "Complete previous\nmission to unlock", {
         fontSize: "13px", fontFamily: "'Share Tech Mono', monospace",
         color: "#334455", align: "center", lineSpacing: 4,
       }).setOrigin(0.5);

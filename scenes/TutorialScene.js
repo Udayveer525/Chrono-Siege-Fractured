@@ -179,8 +179,8 @@ export default class TutorialScene extends Phaser.Scene {
   }
 
   _towerRow(y, cfg) {
-    const swatch = this.add.rectangle(COL_L + 20, y + 20, 36, 36, cfg.color);
-    swatch.setStrokeStyle(1.5, 0xffffff, 0.3);
+    const swatch = this.add.sprite(COL_L + 20, y + 20, cfg.spriteKey);
+    swatch.setScale(36 / swatch.width);
 
     const name = this.add.text(COL_L + 52, y, cfg.name, S.name);
     const cost = this.add.text(COL_L + 52, y + 22, `⬡ ${cfg.cost}`, S.cost);
@@ -192,8 +192,8 @@ export default class TutorialScene extends Phaser.Scene {
   }
 
   _enemyRow(y, cfg) {
-    const dot = this.add.circle(COL_L + 18, y + 18, 16, cfg.color);
-    dot.setStrokeStyle(1.5, 0xffffff, 0.25);
+    const dot = this.add.sprite(COL_L + 18, y + 18, cfg.spriteKey);
+    dot.setScale(32 / dot.width);
 
     const name   = this.add.text(COL_L + 46, y, cfg.name, S.name);
     const stats  = this.add.text(COL_L + 46, y + 22, `HP ${cfg.hp}  •  REWARD ⬡ ${cfg.reward}  •  Speed ${cfg.speed > 0.0001 ? "FAST" : cfg.speed > 0.00006 ? "MEDIUM" : "SLOW"}`, S.stat);
